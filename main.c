@@ -1,7 +1,7 @@
 /*
  * 1)
  * 2) прописать систему флагов
- * 3) переписать методы для сокращения кода
+ * 3)
  * 4) прописать изменение тега
  * 5)  
  *
@@ -90,7 +90,7 @@ void printer(struct strochka s) {
     }
 }
 
-void  advanced_printer(struct strochka s) {
+void advanced_printer(struct strochka s) {
     printf("%s", messages[s.type1]);
     printf("%" PRId8, s.massiv[0]);
     printf("%" PRId8 "|", s.massiv[1]);
@@ -181,16 +181,16 @@ int16_t signed_representation(struct strochka s) {
             }
         }
         for (size_t i = 2; i < 9; i++, index--) {
-            tmp = (int16_t)(tmp + (int16_t) vrem[i] * (int16_t) pow(2, index));
+            tmp = (int16_t) (tmp + (int16_t) vrem[i] * (int16_t) pow(2, index));
         }
         int16_t tmp2 = tmp;
         while (zops != 2) {
-            tmp = (int16_t)(tmp - tmp2);
+            tmp = (int16_t) (tmp - tmp2);
             zops++;
         }
     } else {
         for (size_t i = 2; i < 9; i++, index--) {
-            tmp = (int16_t )(tmp + (int16_t) s.massiv[i] * (int16_t) pow(2, index));
+            tmp = (int16_t) (tmp + (int16_t) s.massiv[i] * (int16_t) pow(2, index));
         }
     }
     return tmp;
@@ -230,7 +230,7 @@ void clear_buffer_and_c(int8_t **buffer, struct strochka *c) {
 void sum(int8_t **buffer, struct strochka *a, struct strochka *b, struct strochka *c) {
     int8_t tmp;
     for (size_t i = 8; i > 0; i--) {
-        tmp = (int8_t)((*buffer)[i] + b->massiv[i] + a->massiv[i]);
+        tmp = (int8_t) ((*buffer)[i] + b->massiv[i] + a->massiv[i]);
         switch (tmp) {
             case 3:
                 c->massiv[i] = 1;
@@ -255,7 +255,8 @@ void sum(int8_t **buffer, struct strochka *a, struct strochka *b, struct strochk
 }
 
 
-void all_free(struct strochka a_pr, struct strochka b_pr, struct strochka a_minus_dop, struct strochka b_minus_dop, int8_t* buffer, struct  strochka c_strochka){
+void all_free(struct strochka a_pr, struct strochka b_pr, struct strochka a_minus_dop, struct strochka b_minus_dop,
+              int8_t *buffer, struct strochka c_strochka) {
     free(a_pr.massiv);
     free(b_pr.massiv);
     free(a_minus_dop.massiv);
@@ -264,9 +265,30 @@ void all_free(struct strochka a_pr, struct strochka b_pr, struct strochka a_minu
     free(c_strochka.massiv);
 }
 
-//void printer_of_blocks(struct strochka* a, struct strochka* b,  int8_t buffer, struct  strochka* c_strochka){
+void printer_of_bigger_lower(int16_t a, int16_t b) {
+    if (a > 0) { printf("A > 0   "); }
+    else { printf("A < 0   "); }
+    if (b < 0) { printf("B < 0"); }
+    else { printf("B > 0"); }
+}
 
-//}
+void printer_of_blocks(struct strochka *a, struct strochka *b, int8_t *buffer, struct strochka *c_strochka) {
+    int16_t a_ten = signed_representation(*a);
+    int16_t b_ten = signed_representation(*b);
+    printer_of_bigger_lower(a_ten, b_ten);
+    new_line();
+    printer_buffer_for_sum(buffer);
+    printf("   Znak   Bez_znak");
+    new_line();
+    printer(*a);
+    printf("   %  " PRId16, a_ten);
+    printf("      %  " PRId16, unsigned_representation(*a));
+    new_line();
+    printer(*b);
+    printf("   %  " PRId16, b_ten);
+    printf("      %  " PRId16, unsigned_representation(*b));
+
+}
 
 int main() {
     struct strochka a_pr; // Число A
@@ -277,14 +299,14 @@ int main() {
     struct strochka c_strochka; //ответ после сложения
 
     create_buffer(&buffer); //выделяем память в куче под буфер
-    creat_c(&c_strochka); //создаем ссылку на кучу для C. Заполняем нулями
+    creat_c(&c_strochka); //Создаём ссылку на кучу для C. Заполняем нулями
 
 
     print_start_of_program();// начинаем программу
     a_pr = reader_plus_convertor(A_pr); //Ввод первого числа
     b_pr = reader_plus_convertor(B_pr); //Ввод второго числа
 
-    clear_buffer_and_c(&buffer, &c_strochka); // зануляем буфер и стрчку ответа
+    clear_buffer_and_c(&buffer, &c_strochka); // зануляем буфер и строчку ответа
 
     a_minus_dop = copy_strochka(a_pr); //копируем A в переменную для -A в оп коде
     b_minus_dop = copy_strochka(b_pr); //копируем B в переменную для -B в оп коде
@@ -294,26 +316,7 @@ int main() {
 
     sum(&buffer, &a_pr, &b_pr, &c_strochka);
 
-    printer_buffer_for_sum(buffer);
-    printf("   Znak   Bez_znak");
-    new_line();
-    printer(a_pr);
-    printf("   %  " PRId16, signed_representation(a_pr));
-    printf("      %  " PRId16, unsigned_representation(a_pr));
-    new_line();
-    printer(b_pr);
-    printf("   %  " PRId16, signed_representation(b_pr));
-    printf("       %  " PRId16, unsigned_representation(b_pr));
-    new_line();
-    printer(c_strochka);
-    printf("   %  " PRId16, signed_representation(c_strochka));
-    printf("      %  " PRId16, unsigned_representation(c_strochka));
-    new_line();
-
-
-
-
-
+    printer_of_blocks(&a_pr, &b_pr, buffer, &c_strochka);
 
 
     all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_strochka);
