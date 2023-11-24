@@ -56,8 +56,8 @@ struct strochka reader_plus_convertor(enum type s) {
     int8_t *mas = calloc(sizeof(int8_t), 10);
     size_t i = 8;
     while (tmp >= 1) {
-        mas[i] = tmp % 2;
-        tmp = tmp / 2;
+        mas[i] = (int8_t) (tmp % 2);
+        tmp = (int8_t) (tmp / 2);
         i--;
     }
     return (struct strochka) {.type1 = s, .massiv = mas};
@@ -90,7 +90,7 @@ void printer(struct strochka s) {
     }
 }
 
-void advanced_printer(struct strochka s) {
+void  advanced_printer(struct strochka s) {
     printf("%s", messages[s.type1]);
     printf("%" PRId8, s.massiv[0]);
     printf("%" PRId8 "|", s.massiv[1]);
@@ -140,11 +140,11 @@ struct strochka copy_strochka(struct strochka s) {
     return (struct strochka) {.type1 = s.type1, .massiv = mas};
 }
 
-int16_t unsigned_representation(struct strochka *s) {
+int16_t unsigned_representation(struct strochka s) {
     int16_t tmp = 0;
     int8_t index = 7;
     for (size_t i = 1; i < 9; i++, index--) {
-        tmp = tmp + (int16_t) s->massiv[i] * (int16_t) pow(2, index);
+        tmp = (int16_t) (tmp + (int16_t) s.massiv[i] * (int16_t) pow(2, index));
     }
     return tmp;
 }
@@ -157,13 +157,13 @@ void test_printer(int8_t s[]){
 }
 */
 
-int16_t signed_representation(struct strochka *s) {
+int16_t signed_representation(struct strochka s) {
     int16_t tmp = 0;
     int8_t index = 6;
     int8_t vrem[9];
     int8_t zops = 0;
-    if (s->massiv[1] == 1) {
-        for (size_t i = 0; i != 9; i++) { vrem[i] = s->massiv[i]; }
+    if (s.massiv[1] == 1) {
+        for (size_t i = 0; i != 9; i++) { vrem[i] = s.massiv[i]; }
 
         //test_printer(vrem);
         //new_line();
@@ -181,16 +181,16 @@ int16_t signed_representation(struct strochka *s) {
             }
         }
         for (size_t i = 2; i < 9; i++, index--) {
-            tmp = tmp + (int16_t) vrem[i] * (int16_t) pow(2, index);
+            tmp = (int16_t)(tmp + (int16_t) vrem[i] * (int16_t) pow(2, index));
         }
         int16_t tmp2 = tmp;
         while (zops != 2) {
-            tmp = tmp - tmp2;
+            tmp = (int16_t)(tmp - tmp2);
             zops++;
         }
     } else {
         for (size_t i = 2; i < 9; i++, index--) {
-            tmp = tmp + (int16_t) s->massiv[i] * (int16_t) pow(2, index);
+            tmp = (int16_t )(tmp + (int16_t) s.massiv[i] * (int16_t) pow(2, index));
         }
     }
     return tmp;
@@ -230,7 +230,7 @@ void clear_buffer_and_c(int8_t **buffer, struct strochka *c) {
 void sum(int8_t **buffer, struct strochka *a, struct strochka *b, struct strochka *c) {
     int8_t tmp;
     for (size_t i = 8; i > 0; i--) {
-        tmp = (*buffer)[i] + b->massiv[i] + a->massiv[i];
+        tmp = (int8_t)((*buffer)[i] + b->massiv[i] + a->massiv[i]);
         switch (tmp) {
             case 3:
                 c->massiv[i] = 1;
@@ -264,6 +264,10 @@ void all_free(struct strochka a_pr, struct strochka b_pr, struct strochka a_minu
     free(c_strochka.massiv);
 }
 
+//void printer_of_blocks(struct strochka* a, struct strochka* b,  int8_t buffer, struct  strochka* c_strochka){
+
+//}
+
 int main() {
     struct strochka a_pr; // Число A
     struct strochka b_pr; // Число B
@@ -294,16 +298,16 @@ int main() {
     printf("   Znak   Bez_znak");
     new_line();
     printer(a_pr);
-    printf("   %  " PRId16, signed_representation(&a_pr));
-    printf("      %  " PRId16, unsigned_representation(&a_pr));
+    printf("   %  " PRId16, signed_representation(a_pr));
+    printf("      %  " PRId16, unsigned_representation(a_pr));
     new_line();
     printer(b_pr);
-    printf("   %  " PRId16, signed_representation(&b_pr));
-    printf("       %  " PRId16, unsigned_representation(&b_pr));
+    printf("   %  " PRId16, signed_representation(b_pr));
+    printf("       %  " PRId16, unsigned_representation(b_pr));
     new_line();
     printer(c_strochka);
-    printf("   %  " PRId16, signed_representation(&c_strochka));
-    printf("      %  " PRId16, unsigned_representation(&c_strochka));
+    printf("   %  " PRId16, signed_representation(c_strochka));
+    printf("      %  " PRId16, unsigned_representation(c_strochka));
     new_line();
 
 
