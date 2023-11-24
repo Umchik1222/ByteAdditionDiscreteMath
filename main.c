@@ -71,7 +71,7 @@ void new_line() {
 void exit1() {
     char tmp[100];
     new_line();
-    printf("Enter any number");
+    printf("Enter any character");
     new_line();
     while (1) {
         scanf("%s", tmp);
@@ -198,7 +198,7 @@ int16_t signed_representation(struct strochka *s) {
 
 void create_buffer(int8_t **s) {
     *s = calloc(sizeof(int8_t), 10);
-};
+}
 
 void print_start_of_program() {
     printf("Enter two numbers, separate them by pressing enter");
@@ -255,6 +255,15 @@ void sum(int8_t **buffer, struct strochka *a, struct strochka *b, struct strochk
 }
 
 
+void all_free(struct strochka a_pr, struct strochka b_pr, struct strochka a_minus_dop, struct strochka b_minus_dop, int8_t* buffer, struct  strochka c_strochka){
+    free(a_pr.massiv);
+    free(b_pr.massiv);
+    free(a_minus_dop.massiv);
+    free(b_minus_dop.massiv);
+    free(buffer);
+    free(c_strochka.massiv);
+}
+
 int main() {
     struct strochka a_pr; // Число A
     struct strochka b_pr; // Число B
@@ -290,7 +299,7 @@ int main() {
     new_line();
     printer(b_pr);
     printf("   %  " PRId16, signed_representation(&b_pr));
-    printf("      %  " PRId16, unsigned_representation(&b_pr));
+    printf("       %  " PRId16, unsigned_representation(&b_pr));
     new_line();
     printer(c_strochka);
     printf("   %  " PRId16, signed_representation(&c_strochka));
@@ -301,12 +310,9 @@ int main() {
 
 
 
-    free(a_pr.massiv);
-    free(b_pr.massiv);
-    free(a_minus_dop.massiv);
-    free(b_minus_dop.massiv);
-    free(buffer);
-    free(c_strochka.massiv);
+
+
+    all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_strochka);
 
 
     exit1();
