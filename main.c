@@ -226,7 +226,7 @@ void clear_buffer_and_c(int8_t **buffer, struct line *c) {
     }
 }
 
-void sum(int8_t **buffer, struct line   *a, struct line *b, struct line *c) {
+void sum(int8_t **buffer, struct line *a, struct line *b, struct line *c) {
     int8_t tmp;
     for (size_t i = 8; i > 0; i--) {
         tmp = (int8_t) ((*buffer)[i] + b->massiv[i] + a->massiv[i]);
@@ -271,21 +271,68 @@ void printer_of_bigger_lower(int16_t a, int16_t b) {
     else { printf("B > 0"); }
 }
 
+//void printer_underlining(){
+//   printf("------------------ -----  ---------");
+//}
+
+void
+printer_of_two_or_one_c_lines(struct line *c_line, int16_t a_ten_s, int16_t b_ten_s, int16_t a_ten_u, int16_t b_ten_u) {
+    printer(*c_line);
+    if (c_line->massiv[1] == 1) {
+        printf("       ");
+    } else {
+        printf("    %" PRId16, signed_representation(*c_line));
+        if (signed_representation(*c_line) != (a_ten_s + b_ten_s)) {
+            printf("?");
+        }
+    }
+
+    printf("       %" PRId16, unsigned_representation(*c_line));
+    if (unsigned_representation(*c_line) != (a_ten_u + b_ten_u)) {
+        printf("?");
+    }
+    if (c_line->massiv[1] == 1) {
+        new_line();
+        revers_save_line(c_line);
+        plus_one_line(c_line);
+        c_line->type1 = C_pr;
+        printer(*c_line);
+        revers_save_line(c_line);
+        plus_one_line(c_line);
+        printf("   %" PRId16, signed_representation(*c_line));
+        if (signed_representation(*c_line) != (a_ten_s + b_ten_s)) {
+            printf("?");
+        }
+    }
+
+
+}
+
 void printer_of_blocks(struct line *a, struct line *b, int8_t *buffer, struct line *c_line) {
-    int16_t a_ten = signed_representation(*a);
-    int16_t b_ten = signed_representation(*b);
-    printer_of_bigger_lower(a_ten, b_ten);
+    int16_t a_ten_s = signed_representation(*a);
+    int16_t b_ten_s = signed_representation(*b);
+    int16_t a_ten_u = unsigned_representation(*a);
+    int16_t b_ten_u = unsigned_representation(*b);
+
+    printer_of_bigger_lower(a_ten_s, b_ten_s);
     new_line();
     printer_buffer_for_sum(buffer);
     printf("   Znak   Bez_znak");
     new_line();
     printer(*a);
-    printf("   %  " PRId16, a_ten);
-    printf("      %  " PRId16, unsigned_representation(*a));
+    printf("   %  " PRId16, a_ten_s);
+    printf("      %  " PRId16, a_ten_u);
     new_line();
     printer(*b);
-    printf("   %  " PRId16, b_ten);
-    printf("      %  " PRId16, unsigned_representation(*b));
+    printf("   %  " PRId16, b_ten_s);
+    printf("      %  " PRId16, b_ten_u);
+    new_line();
+
+    printer_of_two_or_one_c_lines(c_line, a_ten_s, b_ten_s, a_ten_u, b_ten_u);
+    clear_buffer_and_c(&buffer, c_line);
+    new_line();
+    new_line();
+
 
 }
 
@@ -314,9 +361,16 @@ int main() {
     neg_dop_line(&b_minus_dop); // Превращаем B в доп код отрицательного числа
 
     sum(&buffer, &a_pr, &b_pr, &c_line);
-
     printer_of_blocks(&a_pr, &b_pr, buffer, &c_line);
 
+    sum(&buffer, &a_pr, &b_minus_dop, &c_line);
+    printer_of_blocks(&a_pr, &b_minus_dop, buffer, &c_line);
+
+    sum(&buffer, &a_minus_dop, &b_pr, &c_line);
+    printer_of_blocks(&a_minus_dop, &b_pr, buffer, &c_line);
+
+    sum(&buffer, &a_minus_dop, &b_minus_dop, &c_line);
+    printer_of_blocks(&a_minus_dop, &b_minus_dop, buffer, &c_line);
 
     all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_line);
 
