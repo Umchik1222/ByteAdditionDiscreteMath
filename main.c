@@ -19,7 +19,7 @@ enum type {
     A_pr = 0, A_dop, B_pr, B_dop, C_pr, C_dop, None, Asrev, Bsrev, Csrev
 };
 
-struct strochka {
+struct line {
     enum type type1;
     int8_t *massiv;
 };
@@ -51,7 +51,7 @@ int8_t reading_number() {
 }
 
 
-struct strochka reader_plus_convertor(enum type s) {
+struct line reader_plus_convertor(enum type s) {
     int8_t tmp = reading_number();
     int8_t *mas = calloc(sizeof(int8_t), 10);
     size_t i = 8;
@@ -60,7 +60,7 @@ struct strochka reader_plus_convertor(enum type s) {
         tmp = (int8_t) (tmp / 2);
         i--;
     }
-    return (struct strochka) {.type1 = s, .massiv = mas};
+    return (struct line) {.type1 = s, .massiv = mas};
 }
 
 
@@ -81,7 +81,7 @@ void exit1() {
     }
 }
 
-void printer(struct strochka s) {
+void printer(struct line s) {
     printf("%s ", messages[s.type1]);
     printf("%" PRId8 "|", s.massiv[1]);
     for (size_t i = 2; i != 9; i++) {
@@ -90,7 +90,7 @@ void printer(struct strochka s) {
     }
 }
 
-void advanced_printer(struct strochka s) {
+void advanced_printer(struct line s) {
     printf("%s", messages[s.type1]);
     printf("%" PRId8, s.massiv[0]);
     printf("%" PRId8 "|", s.massiv[1]);
@@ -100,20 +100,19 @@ void advanced_printer(struct strochka s) {
     printf("|%" PRId8, s.massiv[9]);
 }
 
-void revers_sign(struct strochka *origin) {
+void revers_sign(struct line *origin) {
     if (origin->massiv[1] == 1) { origin->massiv[1] = 0; }
     else { origin->massiv[1] = 1; }
 }
 
-
-void revers_save_strochka(struct strochka *origin) {
+void revers_save_line(struct line *origin) {
     for (size_t i = 2; i != 9; i++) {
         if (origin->massiv[i] == 1) { origin->massiv[i] = 0; }
         else { origin->massiv[i] = 1; }
     }
 }
 
-void plus_one_strochka(struct strochka *origin) {
+void plus_one_line(struct line *origin) {
     int8_t transfer = 1;
     for (size_t i = 8; transfer != 0; i--) {
         if (origin->massiv[i] + transfer == 2) { origin->massiv[i] = 0; }
@@ -124,23 +123,23 @@ void plus_one_strochka(struct strochka *origin) {
     }
 }
 
-void neg_dop_strochka(struct strochka *origin) {
-    revers_save_strochka(origin);
+void neg_dop_line(struct line *origin) {
+    revers_save_line(origin);
     revers_sign(origin);
-    plus_one_strochka(origin);
+    plus_one_line(origin);
     if (origin->type1 == A_pr) { origin->type1 = A_dop; }
     else if (origin->type1 == B_pr) { origin->type1 = B_dop; }
 }
 
-struct strochka copy_strochka(struct strochka s) {
+struct line copy_line(struct line s) {
     int8_t *mas = calloc(sizeof(int8_t), 10);
     for (size_t i = 0; i != 10; i++) {
         mas[i] = s.massiv[i];
     }
-    return (struct strochka) {.type1 = s.type1, .massiv = mas};
+    return (struct line) {.type1 = s.type1, .massiv = mas};
 }
 
-int16_t unsigned_representation(struct strochka s) {
+int16_t unsigned_representation(struct line s) {
     int16_t tmp = 0;
     int8_t index = 7;
     for (size_t i = 1; i < 9; i++, index--) {
@@ -157,7 +156,7 @@ void test_printer(int8_t s[]){
 }
 */
 
-int16_t signed_representation(struct strochka s) {
+int16_t signed_representation(struct line s) {
     int16_t tmp = 0;
     int8_t index = 6;
     int8_t vrem[9];
@@ -205,7 +204,7 @@ void print_start_of_program() {
     new_line();
 }
 
-void creat_c(struct strochka *c) {
+void creat_c(struct line *c) {
     int8_t *m = calloc(sizeof(int8_t), 10);
     c->massiv = m;
     c->type1 = None;
@@ -219,7 +218,7 @@ void printer_buffer_for_sum(int8_t *s) {
     }
 }
 
-void clear_buffer_and_c(int8_t **buffer, struct strochka *c) {
+void clear_buffer_and_c(int8_t **buffer, struct line *c) {
     for (size_t i = 0; i != 10; i++) {
         (*buffer)[i] = 0;
         c->massiv[i] = 0;
@@ -227,7 +226,7 @@ void clear_buffer_and_c(int8_t **buffer, struct strochka *c) {
     }
 }
 
-void sum(int8_t **buffer, struct strochka *a, struct strochka *b, struct strochka *c) {
+void sum(int8_t **buffer, struct line   *a, struct line *b, struct line *c) {
     int8_t tmp;
     for (size_t i = 8; i > 0; i--) {
         tmp = (int8_t) ((*buffer)[i] + b->massiv[i] + a->massiv[i]);
@@ -255,14 +254,14 @@ void sum(int8_t **buffer, struct strochka *a, struct strochka *b, struct strochk
 }
 
 
-void all_free(struct strochka a_pr, struct strochka b_pr, struct strochka a_minus_dop, struct strochka b_minus_dop,
-              int8_t *buffer, struct strochka c_strochka) {
+void all_free(struct line a_pr, struct line b_pr, struct line a_minus_dop, struct line b_minus_dop,
+              int8_t *buffer, struct line c_line) {
     free(a_pr.massiv);
     free(b_pr.massiv);
     free(a_minus_dop.massiv);
     free(b_minus_dop.massiv);
     free(buffer);
-    free(c_strochka.massiv);
+    free(c_line.massiv);
 }
 
 void printer_of_bigger_lower(int16_t a, int16_t b) {
@@ -272,7 +271,7 @@ void printer_of_bigger_lower(int16_t a, int16_t b) {
     else { printf("B > 0"); }
 }
 
-void printer_of_blocks(struct strochka *a, struct strochka *b, int8_t *buffer, struct strochka *c_strochka) {
+void printer_of_blocks(struct line *a, struct line *b, int8_t *buffer, struct line *c_line) {
     int16_t a_ten = signed_representation(*a);
     int16_t b_ten = signed_representation(*b);
     printer_of_bigger_lower(a_ten, b_ten);
@@ -291,35 +290,35 @@ void printer_of_blocks(struct strochka *a, struct strochka *b, int8_t *buffer, s
 }
 
 int main() {
-    struct strochka a_pr; // Число A
-    struct strochka b_pr; // Число B
-    struct strochka a_minus_dop; // Число -A в дополнительном коде
-    struct strochka b_minus_dop; // Число -A в дополнительном коде
+    struct line a_pr; // Число A
+    struct line b_pr; // Число B
+    struct line a_minus_dop; // Число -A в дополнительном коде
+    struct line b_minus_dop; // Число -A в дополнительном коде
     int8_t *buffer; // Буфер для переносов
-    struct strochka c_strochka; //ответ после сложения
+    struct line c_line; //ответ после сложения
 
     create_buffer(&buffer); //выделяем память в куче под буфер
-    creat_c(&c_strochka); //Создаём ссылку на кучу для C. Заполняем нулями
+    creat_c(&c_line); //Создаём ссылку на кучу для C. Заполняем нулями
 
 
     print_start_of_program();// начинаем программу
     a_pr = reader_plus_convertor(A_pr); //Ввод первого числа
     b_pr = reader_plus_convertor(B_pr); //Ввод второго числа
 
-    clear_buffer_and_c(&buffer, &c_strochka); // зануляем буфер и строчку ответа
+    clear_buffer_and_c(&buffer, &c_line); // Очищаем буфер и строчку ответа
 
-    a_minus_dop = copy_strochka(a_pr); //копируем A в переменную для -A в оп коде
-    b_minus_dop = copy_strochka(b_pr); //копируем B в переменную для -B в оп коде
+    a_minus_dop = copy_line(a_pr); //копируем A в переменную для -A в оп коде
+    b_minus_dop = copy_line(b_pr); //копируем B в переменную для -B в оп коде
 
-    neg_dop_strochka(&a_minus_dop); // Превращаем A в доп код отрицательного числа
-    neg_dop_strochka(&b_minus_dop); // Превращаем B в доп код отрицательного числа
+    neg_dop_line(&a_minus_dop); // Превращаем A в доп код отрицательного числа
+    neg_dop_line(&b_minus_dop); // Превращаем B в доп код отрицательного числа
 
-    sum(&buffer, &a_pr, &b_pr, &c_strochka);
+    sum(&buffer, &a_pr, &b_pr, &c_line);
 
-    printer_of_blocks(&a_pr, &b_pr, buffer, &c_strochka);
+    printer_of_blocks(&a_pr, &b_pr, buffer, &c_line);
 
 
-    all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_strochka);
+    all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_line);
 
 
     exit1();
