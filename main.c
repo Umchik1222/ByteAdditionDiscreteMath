@@ -148,13 +148,6 @@ int16_t unsigned_representation(struct line s) {
     return tmp;
 }
 
-/*
-void test_printer(int8_t s[]){
-    for(size_t i = 0; i !=9; i++){
-        printf("%" PRId8, s[i]);
-    }
-}
-*/
 
 int16_t signed_representation(struct line s) {
     int16_t tmp = 0;
@@ -163,10 +156,6 @@ int16_t signed_representation(struct line s) {
     int8_t zops = 0;
     if (s.massiv[1] == 1) {
         for (size_t i = 0; i != 9; i++) { vrem[i] = s.massiv[i]; }
-
-        //test_printer(vrem);
-        //new_line();
-
         for (size_t i = 2; i != 9; i++) {
             if (vrem[i] == 1) { vrem[i] = 0; }
             else { vrem[i] = 1; }
@@ -264,6 +253,37 @@ void all_free(struct line a_pr, struct line b_pr, struct line a_minus_dop, struc
     free(c_line.massiv);
 }
 
+int8_t getCF(int8_t *buffer) {
+    return buffer[0];
+}
+
+int8_t getPF(struct line *cline){
+    int8_t tmp = 0;
+    for (size_t i =1; i!=9; i++){
+        tmp = tmp + cline->massiv[i];
+    }
+    if(tmp%2==1){return 0;}
+    else{return 1;}
+}
+
+int8_t getAFs(int8_t *buffer){
+    return buffer[4];
+}
+
+int8_t getZF(struct line *c_line){
+    if(unsigned_representation(*c_line) == 0){return 1;}
+    else{return 0;}
+}
+
+int8_t getSF(struct line* c_line){
+    return c_line->massiv[1];
+}
+
+int8_t getOF(int8_t* buffer){
+    if(buffer[0] == buffer[1]){return 0;}
+    else{return 1;}
+}
+
 void printer_of_bigger_lower(int16_t a, int16_t b) {
     if (a > 0) { printf("A > 0   "); }
     else { printf("A < 0   "); }
@@ -271,12 +291,14 @@ void printer_of_bigger_lower(int16_t a, int16_t b) {
     else { printf("B > 0"); }
 }
 
-//void printer_underlining(){
-//   printf("------------------ -----  ---------");
-//}
+void printer_underlining() {
+    printf("------------------ -----  ---------");
+}
 
 void
 printer_of_two_or_one_c_lines(struct line *c_line, int16_t a_ten_s, int16_t b_ten_s, int16_t a_ten_u, int16_t b_ten_u) {
+    printer_underlining();
+    new_line();
     printer(*c_line);
     if (c_line->massiv[1] == 1) {
         printf("       ");
@@ -288,10 +310,13 @@ printer_of_two_or_one_c_lines(struct line *c_line, int16_t a_ten_s, int16_t b_te
     }
 
     printf("       %" PRId16, unsigned_representation(*c_line));
+
     if (unsigned_representation(*c_line) != (a_ten_u + b_ten_u)) {
         printf("?");
     }
     if (c_line->massiv[1] == 1) {
+        new_line();
+        printer_underlining();
         new_line();
         revers_save_line(c_line);
         plus_one_line(c_line);
@@ -303,6 +328,8 @@ printer_of_two_or_one_c_lines(struct line *c_line, int16_t a_ten_s, int16_t b_te
         if (signed_representation(*c_line) != (a_ten_s + b_ten_s)) {
             printf("?");
         }
+
+
     }
 
 
@@ -329,10 +356,11 @@ void printer_of_blocks(struct line *a, struct line *b, int8_t *buffer, struct li
     new_line();
 
     printer_of_two_or_one_c_lines(c_line, a_ten_s, b_ten_s, a_ten_u, b_ten_u);
+    new_line();
+    printf("CF=%"PRId8" ZF=%"PRId8" PF=%"PRId8" AF=%"PRId8" SF=%"PRId8" OF=%"PRId8, getCF(buffer), getZF(c_line), getPF(c_line), getAFs(buffer), getSF(c_line), getOF(buffer));
     clear_buffer_and_c(&buffer, c_line);
     new_line();
     new_line();
-
 
 }
 
