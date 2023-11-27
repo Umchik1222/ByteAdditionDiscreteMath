@@ -1,13 +1,3 @@
-/*
- * 1)
- * 2) прописать систему флагов
- * 3)
- * 4) прописать изменение тега
- * 5)  
- *
- */
-
-
 #include <stdio.h>
 #include <malloc.h>
 #include <stdbool.h>
@@ -50,19 +40,23 @@ int8_t reading_number() {
     return (int8_t) number;
 }
 
+struct line convertor(int8_t number) {
+    int8_t *mas = calloc(sizeof(int8_t), 10);
+    size_t i = 8;
+    while (number >= 1) {
+        mas[i] = (int8_t) (number % 2);
+        number = (int8_t) (number / 2);
+        i--;
+    }
+    return (struct line) {.type1 = None, .massiv = mas};
+}
 
 struct line reader_plus_convertor(enum type s) {
     int8_t tmp = reading_number();
-    int8_t *mas = calloc(sizeof(int8_t), 10);
-    size_t i = 8;
-    while (tmp >= 1) {
-        mas[i] = (int8_t) (tmp % 2);
-        tmp = (int8_t) (tmp / 2);
-        i--;
-    }
-    return (struct line) {.type1 = s, .massiv = mas};
+    struct line pattern = convertor(tmp);
+    pattern.type1 = s;
+    return pattern;
 }
-
 
 void new_line() {
     printf("\n");
@@ -147,7 +141,6 @@ int16_t unsigned_representation(struct line s) {
     }
     return tmp;
 }
-
 
 int16_t signed_representation(struct line s) {
     int16_t tmp = 0;
@@ -242,7 +235,6 @@ void sum(int8_t **buffer, struct line *a, struct line *b, struct line *c) {
     else { c->type1 = C_pr; }
 }
 
-
 void all_free(struct line a_pr, struct line b_pr, struct line a_minus_dop, struct line b_minus_dop,
               int8_t *buffer, struct line c_line) {
     free(a_pr.massiv);
@@ -253,11 +245,11 @@ void all_free(struct line a_pr, struct line b_pr, struct line a_minus_dop, struc
     free(c_line.massiv);
 }
 
-int8_t getCF(int8_t *buffer) {
+int8_t getCF(const int8_t *buffer) {
     return buffer[0];
 }
 
-int8_t getPF(struct line *cline) {
+int8_t getPF(const struct line *cline) {
     int8_t tmp = 0;
     for (size_t i = 1; i != 9; i++) {
         tmp = (int8_t) (tmp + cline->massiv[i]);
@@ -266,22 +258,35 @@ int8_t getPF(struct line *cline) {
     else { return 1; }
 }
 
-int8_t getAFs(int8_t *buffer) {
+int8_t getAFs(const int8_t *buffer) {
     return buffer[4];
 }
 
-int8_t getZF(struct line *c_line) {
+int8_t getZF(const struct line *c_line) {
     if (unsigned_representation(*c_line) == 0) { return 1; }
     else { return 0; }
 }
 
-int8_t getSF(struct line *c_line) {
+int8_t getSF(const struct line *c_line) {
     return c_line->massiv[1];
 }
 
 int8_t getOF(const int8_t *buffer) {
     if (buffer[0] == buffer[1]) { return 0; }
     else { return 1; }
+}
+
+void printer_of_explain(int8_t *buffer) {
+    if (getCF(buffer) == 1) {
+        printf("For UsI, the result is incorrect due to the resulting transfer from the higher bit.");
+        new_line();
+        printf("The weight of this transfer is 256.");
+        new_line();
+    }
+    if (getOF(buffer) == 1) {
+        printf("For SsI, the result is incorrect due to the resulting overflow.");
+        new_line();
+    }
 }
 
 void printer_of_bigger_lower(int16_t a, int16_t b) {
@@ -293,6 +298,13 @@ void printer_of_bigger_lower(int16_t a, int16_t b) {
 
 void printer_underlining() {
     printf("------------------ -----  ---------");
+}
+
+int8_t check_for_minus128(struct line *c_line) {
+    if (c_line->massiv[1] == 1 && c_line->massiv[2] == 0 && c_line->massiv[3] == 0 && c_line->massiv[4] == 0 &&
+        c_line->massiv[5] == 0 && c_line->massiv[6] == 0 && c_line->massiv[7] == 0 &&
+        c_line->massiv[8] == 0 && c_line->type1 == C_dop) { return 1; }
+    else { return 0; }
 }
 
 void
@@ -316,17 +328,33 @@ printer_of_two_or_one_c_lines(struct line *c_line, int16_t a_ten_s, int16_t b_te
         new_line();
         printer_underlining();
         new_line();
-        revers_save_line(c_line);
-        plus_one_line(c_line);
-        c_line->type1 = C_pr;
-        printer(*c_line);
-        revers_save_line(c_line);
-        plus_one_line(c_line);
-        printf("   %" PRId16, signed_representation(*c_line));
-        if (signed_representation(*c_line) != (a_ten_s + b_ten_s)) {
-            printf("?");
+        if (check_for_minus128(c_line)) {
+            c_line->type1 = C_pr;
+            c_line->massiv[1] = 1;
+            printer(*c_line);
+            printf("    %d", -128);
+            if (-128 != (a_ten_s + b_ten_s)) {
+                printf("?");
+            }
+        } else {
+            revers_save_line(c_line);
+            plus_one_line(c_line);
+            c_line->type1 = C_pr;
+            printer(*c_line);
+            revers_save_line(c_line);
+            plus_one_line(c_line);
+            printf("   %" PRId16, signed_representation(*c_line));
+            if (signed_representation(*c_line) != (a_ten_s + b_ten_s)) {
+                printf("?");
+            }
         }
     }
+}
+
+
+void printer_start_first(struct line *a_pr, struct line *b_pr) {
+    printf("1. A=%"PRId8", B=%"PRId8, unsigned_representation(*a_pr), unsigned_representation(*b_pr));
+    new_line();
 }
 
 void printer_of_blocks(struct line *a, struct line *b, int8_t *buffer, struct line *c_line) {
@@ -353,10 +381,81 @@ void printer_of_blocks(struct line *a, struct line *b, int8_t *buffer, struct li
     new_line();
     printf("CF=%"PRId8" ZF=%"PRId8" PF=%"PRId8" AF=%"PRId8" SF=%"PRId8" OF=%"PRId8, getCF(buffer), getZF(c_line),
            getPF(c_line), getAFs(buffer), getSF(c_line), getOF(buffer));
+    new_line();
+    printer_of_explain(buffer);
     clear_buffer_and_c(&buffer, c_line);
     new_line();
     new_line();
+}
 
+void
+print_first_task(int8_t *buffer, struct line *a_pr, struct line *b_pr, struct line *c_line, struct line *b_minus_dop,
+                 struct line *a_minus_dop) {
+    printer_start_first(a_pr, b_pr);
+    sum(&buffer, a_pr, b_pr, c_line);
+    printer_of_blocks(a_pr, b_pr, buffer, c_line);
+
+    sum(&buffer, a_pr, b_minus_dop, c_line);
+    printer_of_blocks(a_pr, b_minus_dop, buffer, c_line);
+
+    sum(&buffer, a_minus_dop, b_pr, c_line);
+    printer_of_blocks(a_minus_dop, b_pr, buffer, c_line);
+
+    sum(&buffer, a_minus_dop, b_minus_dop, c_line);
+    printer_of_blocks(a_minus_dop, b_minus_dop, buffer, c_line);
+}
+
+int8_t second_operand_for_second_task(int16_t a) {
+    int8_t b;
+    b = (int8_t) (((128 - a) + 127) / 2);
+    return b;
+}
+
+int8_t second_operand_for_third_task(int16_t b) {
+    int8_t a;
+    a = (int8_t) (128 - b);
+    return a;
+}
+
+void print_second_task(struct line *a_pr, int8_t *buffer, struct line *a_minus_dop, struct line *c_line) {
+    int8_t b = second_operand_for_second_task(unsigned_representation(*a_pr));
+    struct line tmp = convertor(b);
+    tmp.type1 = B_pr;
+    printf("2. The rule for matching looks like this: A + B > 128, so 127 > B > 128 - A, so A = %"PRId16 ", let B = %"PRId8,
+           unsigned_representation(*a_pr), unsigned_representation(tmp));
+    new_line();
+
+    sum(&buffer, a_pr, &tmp, c_line);
+    printer_of_blocks(a_pr, &tmp, buffer, c_line);
+
+    neg_dop_line(&tmp);
+
+    sum(&buffer, a_minus_dop, &tmp, c_line);
+    printer_of_blocks(a_minus_dop, &tmp, buffer, c_line);
+
+    free(tmp.massiv);
+}
+
+void print_third_task(struct line *b_pr, int8_t *buffer, struct line *b_minus_dop, struct line *c_line) {
+    int8_t a = second_operand_for_third_task(unsigned_representation(*b_pr));
+    struct line tmp = convertor(a);
+    tmp.type1 = A_pr;
+    printf("3. The value of the number B is fixed (B = %"PRId16 "), and the value of A is selected\n"
+           "according to the formula A + B = 128, according to which, when adding positive\n"
+           "numbers, an overflow will be fixed, and when adding negative\n"
+           "numbers, this will not be. Then A = %"PRId16".", unsigned_representation(*b_pr),
+           unsigned_representation(tmp));
+    new_line();
+
+    sum(&buffer, &tmp, b_pr, c_line);
+    printer_of_blocks(&tmp, b_pr, buffer, c_line);
+
+    neg_dop_line(&tmp);
+
+    sum(&buffer, &tmp, b_minus_dop, c_line);
+    printer_of_blocks(&tmp, b_minus_dop, buffer, c_line);
+
+    free(tmp.massiv);
 }
 
 int main() {
@@ -383,20 +482,11 @@ int main() {
     neg_dop_line(&a_minus_dop); // Превращаем A в доп код отрицательного числа
     neg_dop_line(&b_minus_dop); // Превращаем B в доп код отрицательного числа
 
-    sum(&buffer, &a_pr, &b_pr, &c_line);
-    printer_of_blocks(&a_pr, &b_pr, buffer, &c_line);
-
-    sum(&buffer, &a_pr, &b_minus_dop, &c_line);
-    printer_of_blocks(&a_pr, &b_minus_dop, buffer, &c_line);
-
-    sum(&buffer, &a_minus_dop, &b_pr, &c_line);
-    printer_of_blocks(&a_minus_dop, &b_pr, buffer, &c_line);
-
-    sum(&buffer, &a_minus_dop, &b_minus_dop, &c_line);
-    printer_of_blocks(&a_minus_dop, &b_minus_dop, buffer, &c_line);
+    print_first_task(buffer, &a_pr, &b_pr, &c_line, &b_minus_dop, &a_minus_dop);
+    print_second_task(&a_pr, buffer, &a_minus_dop, &c_line);
+    print_third_task(&b_pr, buffer, &b_minus_dop, &c_line);
 
     all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_line);
-
 
     exit1();
     return 0;
