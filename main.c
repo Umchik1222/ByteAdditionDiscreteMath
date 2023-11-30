@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include <math.h>
-
+#define MAX_INPUT_SIZE 100
 
 enum type {
     A_pr = 0, A_dop, B_pr, B_dop, C_pr, C_dop, None, Asrev, Bsrev, Csrev
@@ -62,17 +62,18 @@ void new_line() {
     printf("\n");
 }
 
-void exit1() {
-    char tmp[100];
+void exit() {
+    char tmp[MAX_INPUT_SIZE];
     new_line();
-    printf("Enter any character");
-    new_line();
+    printf("Enter 'exit' to quite\n");
     while (1) {
-        scanf("%s", tmp);
-        if (tmp[0] != '\0') {
-            break;
+        scanf("%99s", tmp);
+        if (strcmp(tmp, "exit") == 0) {
+            break;   
+        printf("Некорректный ввод\n");
         }
     }
+    printf("Программа завершена");
 }
 
 void printer(struct line s) {
@@ -488,6 +489,6 @@ int main() {
 
     all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_line);
 
-    exit1();
+    exit();
     return 0;
 }
