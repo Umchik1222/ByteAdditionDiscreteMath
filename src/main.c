@@ -1,68 +1,16 @@
-#include <stdio.h>
-#include <malloc.h>
-#include <stdbool.h>
-#include <inttypes.h>
 #include <math.h>
+#include "reader.h"
+#include <string.h>
 #define MAX_INPUT_SIZE 100
 
-enum type {
-    A_pr = 0, A_dop, B_pr, B_dop, C_pr, C_dop, None, Asrev, Bsrev, Csrev
-};
 
-struct line {
-    enum type type1;
-    int8_t *massiv;
-};
 
-const char *const messages[] = {
-        [A_pr] = "A pr. ",
-        [A_dop] = "A dop.",
-        [B_pr] = "B pr. ",
-        [B_dop] = "B dop.",
-        [C_pr] = "C pr. ",
-        [C_dop] = "C dop.",
-        [None] = "      ",
-        [Asrev] = "Asrev ",
-        [Bsrev] = "Bsrev ",
-        [Csrev] = "Csrev "
-};
-
-bool my_validator(int32_t t) {
-    if (t > 0 && t <= 127) { return 1; }
-    else { return 0; }
-}
-
-int8_t reading_number() {
-    int32_t number = 0;
-    while (!my_validator(number)) {
-        scanf("%" SCNd32, &number);
-    }
-    return (int8_t) number;
-}
-
-struct line convertor(int8_t number) {
-    int8_t *mas = calloc(sizeof(int8_t), 10);
-    size_t i = 8;
-    while (number >= 1) {
-        mas[i] = (int8_t) (number % 2);
-        number = (int8_t) (number / 2);
-        i--;
-    }
-    return (struct line) {.type1 = None, .massiv = mas};
-}
-
-struct line reader_plus_convertor(enum type s) {
-    int8_t tmp = reading_number();
-    struct line pattern = convertor(tmp);
-    pattern.type1 = s;
-    return pattern;
-}
 
 void new_line() {
     printf("\n");
 }
 
-void exit() {
+void exit1() {
     char tmp[MAX_INPUT_SIZE];
     new_line();
     printf("Enter 'exit' to quite\n");
@@ -81,7 +29,7 @@ void printer(struct line s) {
     printf("%" PRId8 "|", s.massiv[1]);
     for (size_t i = 2; i != 9; i++) {
         printf("%"PRId8, (s.massiv[i]));
-        //printf("%d",1%2);
+        
     }
 }
 
@@ -489,6 +437,6 @@ int main() {
 
     all_free(a_pr, b_pr, a_minus_dop, b_minus_dop, buffer, c_line);
 
-    exit();
+    exit1();
     return 0;
 }

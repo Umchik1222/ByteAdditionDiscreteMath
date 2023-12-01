@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.26)
 project(ByteAdditionDiscreteMath C)
 
-set(CMAKE_C_STANDARD 17)
-
-add_executable(ByteAdditionDiscreteMath main.c
+set(SOURCES
+src/reader.c
+src/base_struct.c
+src/main.c
 )
+
+include_directories(include)
+
+add_executable(ByteAdditionDiscreteMath ${SOURCES})
