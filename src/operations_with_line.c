@@ -147,6 +147,25 @@ void sum(int8_t **buffer, struct line *a, struct line *b, struct line *c) {
     else { c->type1 = C_pr; }
 }
 
+int8_t check_for_minus128(struct line *c_line) {
+    if (c_line->massiv[1] == 1 && c_line->massiv[2] == 0 && c_line->massiv[3] == 0 && c_line->massiv[4] == 0 &&
+        c_line->massiv[5] == 0 && c_line->massiv[6] == 0 && c_line->massiv[7] == 0 &&
+        c_line->massiv[8] == 0 && c_line->type1 == C_dop) { return 1; }
+    else { return 0; }
+}
+
+int8_t second_operand_for_second_task(int16_t a) {
+    int8_t b;
+    b = (int8_t) (((128 - a) + 127) / 2);
+    return b;
+}
+
+int8_t second_operand_for_third_task(int16_t b) {
+    int8_t a;
+    a = (int8_t) (128 - b);
+    return a;
+}
+
 void all_free(struct line a_pr, struct line b_pr, struct line a_minus_dop, struct line b_minus_dop,
               int8_t *buffer, struct line c_line) {
     free(a_pr.massiv);

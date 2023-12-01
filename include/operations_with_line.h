@@ -19,6 +19,9 @@ void clear_buffer_and_c(int8_t **buffer, struct line *c);
 void sum(int8_t **buffer, struct line *a, struct line *b, struct line *c);
 void all_free(struct line a_pr, struct line b_pr, struct line a_minus_dop, struct line b_minus_dop,
               int8_t *buffer, struct line c_line);
+int8_t check_for_minus128(struct line *c_line);
+int8_t second_operand_for_second_task(int16_t a);
+int8_t second_operand_for_third_task(int16_t b);
 
 
 #endif

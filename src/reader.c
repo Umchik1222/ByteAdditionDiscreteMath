@@ -6,7 +6,6 @@
 #include <ctype.h>
 
 
-
 bool bigger_validator(char* number) {
     if (strlen(number) == 0) {
         return false;
@@ -17,7 +16,6 @@ bool bigger_validator(char* number) {
             return false;
         }
     }
-
     long num = atol(number);
     if (num > 0 && num <= 127) {
         return true;
@@ -27,15 +25,14 @@ bool bigger_validator(char* number) {
 }
 
 int8_t reading_number() {
-    char number[15];  // Increase the size of the buffer
-    number[0] = '\0'; // Initialize the string
+    char number[15];  
+    number[0] = '\0'; 
     while (!bigger_validator(number)) {
         number[0] = '\0';
         for(size_t i = 1; i != 15; i++){
             number[i] = 0;
         }
-        scanf("%14s", number);  // Use %14s to limit the input to 14 characters
-        
+        scanf_s("%14s", number, 15);  
     }
     return (int8_t)atol(number);
 }
