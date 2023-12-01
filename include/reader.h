@@ -2,12 +2,13 @@
 #define READER_H
 
 #include "base_struct.h"
-#include <stdbool.h>
+#include "operations_with_line.h"
 #include <stdio.h>
-#include <malloc.h>
+#include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
 
 
-struct line convertor(int8_t number);
 struct line reader_plus_convertor(enum type s);
 
 #endif

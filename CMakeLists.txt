@@ -4,6 +4,7 @@ project(ByteAdditionDiscreteMath C)
 set(SOURCES
 src/reader.c
 src/base_struct.c
+src/operations_with_line.c
 src/main.c
 )
 
