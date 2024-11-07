@@ -13,4 +13,6 @@
    cd ./ByteAdditionDiscreteMath
    cmake -G "MinGW Makefiles"
    make
-  Дальше запускаете экзешник из папки.
+   ```
+
+Дальше запускаете экзешник из той же папки.
