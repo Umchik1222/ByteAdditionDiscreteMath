@@ -8,9 +8,6 @@
 Мною багов не замечено, если вы заметили неточность в выводе, сообщите об этом мне.  
 
 # Инструкции по сборке на винде:
-
-1. **Клонируйте репозиторий**:
-
    ```bash
    git clone https://github.com/Umchik1222/ByteAdditionDiscreteMath.git
    cd ./ByteAdditionDiscreteMath
